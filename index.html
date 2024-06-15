@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            height: 150px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .results div {
+            margin-bottom: 10px;
+        }
+        .live, .dead, .unknown {
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .live {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .dead {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .unknown {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Credit Card Checker</h1>
+        <div class="form-group">
+            <label for="card-data">Enter Credit Card Data (one per line in the format number|month|year|cvv):</label>
+            <textarea id="card-data" placeholder="Enter your credit card data here, one per line"></textarea>
+        </div>
+        <button onclick="checkCards()">Check</button>
+        <div class="results">
+            <div class="live">
+                <h3>Live Cards</h3>
+                <div id="live-cards"></div>
+            </div>
+            <div class="dead">
+                <h3>Dead Cards</h3>
+                <div id="dead-cards"></div>
+            </div>
+            <div class="unknown">
+                <h3>Unknown Cards</h3>
+                <div id="unknown-cards"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function checkCards() {
+            const cardData = document.getElementById('card-data').value.split('\n');
+            const liveCards = [];
+            const deadCards = [];
+            const unknownCards = [];
+
+            cardData.forEach(data => {
+                const cardDetails = data.trim().split('|');
+                if (cardDetails.length === 4) {
+                    const result = checkCard(cardDetails[0], cardDetails[1], cardDetails[2], cardDetails[3]);
+                    if (result === 'Live') {
+                        liveCards.push(data);
+                    } else if (result === 'Dead') {
+                        deadCards.push(data);
+                    } else {
+                        unknownCards.push(data);
+                    }
+                }
+            });
+
+            document.getElementById('live-cards').innerHTML = liveCards.join('<br>');
+            document.getElementById('dead-cards').innerHTML = deadCards.join('<br>');
+            document.getElementById('unknown-cards').innerHTML = unknownCards.join('<br>');
+        }
+
+        function checkCard(number, month, year, cvv) {
+            // Replace this with your actual logic to check the card details.
+            // The following is a dummy implementation for demonstration.
+            // You can integrate with an external API or use regex checks.
+
+            // Here, we use a simple Luhn Algorithm to validate card number
+            if (!isValidCardNumber(number)) {
+                return 'Dead';
+            }
+
+            // Further checks can be added here (e.g., expiry date, CVV validation, etc.)
+            if (parseInt(month) < 1 || parseInt(month) > 12 || parseInt(year) < new Date().getFullYear()) {
+                return 'Dead';
+            }
+
+            // Dummy condition to simulate unknown cards
+            if (number.startsWith('0')) {
+                return 'Unknown';
+            }
+
+            return 'Live';
+        }
+
+        function isValidCardNumber(number) {
+            // Implementing Luhn Algorithm to check the card number validity
+            let sum = 0;
+            let shouldDouble = false;
+            for (let i = number.length - 1; i >= 0; i--) {
+                let digit = parseInt(number.charAt(i));
+
+                if (shouldDouble) {
+                    digit *= 2;
+                    if (digit > 9) {
+                        digit -= 9;
+                    }
+                }
+
+                sum += digit;
+                shouldDouble = !shouldDouble;
+            }
+            return sum % 10 === 0;
+        }
+    </script>
+</body>
+</html>
